@@ -74,15 +74,15 @@ function computerMove() {
 }
 function bestMove() {
   let best = -Infinity, move = 0;
-  board.forEach((value, i) => { if (!value) { board[i] = 'O'; const score = minimax(false); board[i] = ''; if (score > best) { best = score; move = i; } } });
+  board.forEach((value, i) => { if (!value) { board[i] = 'O'; const score = minimax(false, 1); board[i] = ''; if (score > best) { best = score; move = i; } } });
   return move;
 }
-function minimax(maximizing) {
-  if (wins.some(row => row.every(i => board[i] === 'O'))) return 10;
-  if (wins.some(row => row.every(i => board[i] === 'X'))) return -10;
+function minimax(maximizing, depth) {
+  if (wins.some(row => row.every(i => board[i] === 'O'))) return 10 - depth;
+  if (wins.some(row => row.every(i => board[i] === 'X'))) return depth - 10;
   if (board.every(Boolean)) return 0;
   const scores = [];
-  board.forEach((value, i) => { if (!value) { board[i] = maximizing ? 'O' : 'X'; scores.push(minimax(!maximizing)); board[i] = ''; } });
+  board.forEach((value, i) => { if (!value) { board[i] = maximizing ? 'O' : 'X'; scores.push(minimax(!maximizing, depth + 1)); board[i] = ''; } });
   return maximizing ? Math.max(...scores) : Math.min(...scores);
 }
 cells.forEach(cell => cell.addEventListener('click', play));
