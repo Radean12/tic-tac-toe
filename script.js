@@ -13,12 +13,16 @@ const startScreen = document.querySelector('#start-screen');
 const coin = document.querySelector('#coin');
 const coinResult = document.querySelector('#coin-result');
 const playerNames = {1: 'PLAYER ONE', 2: 'PLAYER TWO'};
-let board, currentPlayer, symbols, scores = {1: 0, 2: 0}, round = 1, over;
+let board, currentPlayer, symbols, scores = {1: 0, 2: 0}, round = 1, over, gameMode = 'local';
+const modeSelect = document.createElement('select');
+modeSelect.id = 'game-mode';
+modeSelect.innerHTML = '<option value="local">TWO PLAYERS</option><option value="computer">VS COMPUTER</option>';
+document.querySelector('.name-fields').after(modeSelect);
 
 function newSetup(firstPlayer) {
   board = Array(9).fill('');
-  currentPlayer = firstPlayer || (Math.random() < 0.5 ? 1 : 2);
-  symbols = Math.random() < 0.5 ? {1: 'X', 2: 'O'} : {1: 'O', 2: 'X'};
+  currentPlayer = gameMode === 'computer' ? 1 : (firstPlayer || (Math.random() < 0.5 ? 1 : 2));
+  symbols = gameMode === 'computer' ? {1: 'X', 2: 'O'} : (Math.random() < 0.5 ? {1: 'X', 2: 'O'} : {1: 'O', 2: 'X'});
   over = false;
   playerOneSymbol.textContent = symbols[1];
   playerTwoSymbol.textContent = symbols[2];
@@ -58,6 +62,28 @@ function play(event) {
     return;
   }
   currentPlayer = currentPlayer === 1 ? 2 : 1; updateTurn(); render();
+  if (gameMode === 'computer' && currentPlayer === 2) setTimeout(computerMove, 450);
+}
+function computerMove() {
+  if (over || currentPlayer !== 2) return;
+  const move = bestMove(); board[move] = 'O';
+  const line = wins.find(row => row.every(i => board[i] === 'O'));
+  if (line) { over = true; scores[2]++; statusText.textContent = `${playerNames[2]} WINS`; render(); line.forEach(i => cells[i].classList.add('winner')); return; }
+  if (board.every(Boolean)) { over = true; statusText.textContent = 'DRAW'; turnSymbol.textContent = '—'; render(); setTimeout(() => { round++; newSetup(); }, 3000); return; }
+  currentPlayer = 1; updateTurn(); render();
+}
+function bestMove() {
+  let best = -Infinity, move = 0;
+  board.forEach((value, i) => { if (!value) { board[i] = 'O'; const score = minimax(false); board[i] = ''; if (score > best) { best = score; move = i; } } });
+  return move;
+}
+function minimax(maximizing) {
+  if (wins.some(row => row.every(i => board[i] === 'O'))) return 10;
+  if (wins.some(row => row.every(i => board[i] === 'X'))) return -10;
+  if (board.every(Boolean)) return 0;
+  const scores = [];
+  board.forEach((value, i) => { if (!value) { board[i] = maximizing ? 'O' : 'X'; scores.push(minimax(!maximizing)); board[i] = ''; } });
+  return maximizing ? Math.max(...scores) : Math.min(...scores);
 }
 cells.forEach(cell => cell.addEventListener('click', play));
 const startButton = document.querySelector('#start-game');
@@ -65,7 +91,9 @@ startButton.textContent = 'START GAME';
 startButton.addEventListener('click', () => {
   playerNames[1] = document.querySelector('#player-one-name').value.trim().toUpperCase() || 'PLAYER ONE';
   playerNames[2] = document.querySelector('#player-two-name').value.trim().toUpperCase() || 'PLAYER TWO';
-  const winner = Math.random() < 0.5 ? 1 : 2;
+  gameMode = modeSelect.value;
+  if (gameMode === 'computer') playerNames[2] = 'COMPUTER';
+  const winner = gameMode === 'computer' ? 1 : (Math.random() < 0.5 ? 1 : 2);
   startScreen.classList.add('hidden');
   newSetup(winner);
 });
