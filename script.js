@@ -59,14 +59,14 @@ function play(event) {
   currentPlayer = currentPlayer === 1 ? 2 : 1; updateTurn(); render();
 }
 cells.forEach(cell => cell.addEventListener('click', play));
-document.querySelector('#start-game').addEventListener('click', () => {
+const startButton = document.querySelector('#start-game');
+startButton.textContent = 'START GAME';
+startButton.addEventListener('click', () => {
   playerNames[1] = document.querySelector('#player-one-name').value.trim().toUpperCase() || 'PLAYER ONE';
   playerNames[2] = document.querySelector('#player-two-name').value.trim().toUpperCase() || 'PLAYER TWO';
   const winner = Math.random() < 0.5 ? 1 : 2;
-  coin.textContent = winner === 1 ? 'X' : 'O';
-  coin.classList.add('flipping');
-  coinResult.textContent = `${playerNames[winner]} GOES FIRST!`;
-  setTimeout(() => { startScreen.classList.add('hidden'); newSetup(winner); }, 1100);
+  startScreen.classList.add('hidden');
+  newSetup(winner);
 });
 document.querySelector('#reset-round').addEventListener('click', () => { round++; newSetup(); });
 document.querySelector('#new-game').addEventListener('click', () => { scores = {1: 0, 2: 0}; round = 1; newSetup(); });
