@@ -41,7 +41,14 @@ function play(event) {
     statusText.textContent = `PLAYER ${currentPlayer} WINS`;
     render(); line.forEach(i => cells[i].classList.add('winner')); return;
   }
-  if (board.every(Boolean)) { over = true; statusText.textContent = "IT'S A DRAW"; render(); return; }
+  if (board.every(Boolean)) {
+    over = true;
+    statusText.textContent = 'DRAW';
+    turnSymbol.textContent = '—';
+    render();
+    setTimeout(() => { round++; newSetup(); }, 3000);
+    return;
+  }
   currentPlayer = currentPlayer === 1 ? 2 : 1; updateTurn(); render();
 }
 cells.forEach(cell => cell.addEventListener('click', play));
