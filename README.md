@@ -1,18 +1,13 @@
-Tic-Tac-Toe
+# Three in a Row
 
-Run locally with Python 3:
+A responsive two-player tic-tac-toe web application built with vanilla HTML, CSS, and JavaScript.
+
+## Run locally
+
+Open `index.html` in a browser, or serve the folder with any static web server:
 
 ```bash
-python3 main.py
+python3 -m http.server
 ```
 
-- Choose whether to play vs CPU when prompted.
-- Enter moves as numbers 1-9 corresponding to the board positions:
-
-1 | 2 | 3
-- + - + -
-4 | 5 | 6
-- + - + -
-7 | 8 | 9
-
-Enjoy!
+Then visit <http://localhost:8000>.
