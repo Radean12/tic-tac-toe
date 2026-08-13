@@ -5,23 +5,30 @@ const scoreOne = document.querySelector('#score-one');
 const scoreTwo = document.querySelector('#score-two');
 const playerOneSymbol = document.querySelector('#player-one-symbol');
 const playerTwoSymbol = document.querySelector('#player-two-symbol');
+const scoreNames = document.querySelectorAll('.score-name');
 const roundCount = document.querySelector('#round-count');
 const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const startScreen = document.querySelector('#start-screen');
+const coin = document.querySelector('#coin');
+const coinResult = document.querySelector('#coin-result');
+const playerNames = {1: 'PLAYER ONE', 2: 'PLAYER TWO'};
 let board, currentPlayer, symbols, scores = {1: 0, 2: 0}, round = 1, over;
 
-function newSetup() {
+function newSetup(firstPlayer) {
   board = Array(9).fill('');
-  currentPlayer = Math.random() < 0.5 ? 1 : 2;
+  currentPlayer = firstPlayer || (Math.random() < 0.5 ? 1 : 2);
   symbols = Math.random() < 0.5 ? {1: 'X', 2: 'O'} : {1: 'O', 2: 'X'};
   over = false;
   playerOneSymbol.textContent = symbols[1];
   playerTwoSymbol.textContent = symbols[2];
+  scoreNames[0].textContent = playerNames[1];
+  scoreNames[1].textContent = playerNames[2];
   updateTurn();
   render();
 }
 function updateTurn() {
   turnSymbol.textContent = symbols[currentPlayer];
-  statusText.textContent = `PLAYER ${currentPlayer}'S TURN`;
+  statusText.textContent = `${playerNames[currentPlayer]}'S TURN`;
 }
 function render() {
   cells.forEach((cell, i) => {
@@ -38,7 +45,7 @@ function play(event) {
   const line = wins.find(row => row.every(i => board[i] === mark));
   if (line) {
     over = true; scores[currentPlayer]++;
-    statusText.textContent = `PLAYER ${currentPlayer} WINS`;
+    statusText.textContent = `${playerNames[currentPlayer]} WINS`;
     render(); line.forEach(i => cells[i].classList.add('winner')); return;
   }
   if (board.every(Boolean)) {
@@ -52,6 +59,14 @@ function play(event) {
   currentPlayer = currentPlayer === 1 ? 2 : 1; updateTurn(); render();
 }
 cells.forEach(cell => cell.addEventListener('click', play));
+document.querySelector('#start-game').addEventListener('click', () => {
+  playerNames[1] = document.querySelector('#player-one-name').value.trim().toUpperCase() || 'PLAYER ONE';
+  playerNames[2] = document.querySelector('#player-two-name').value.trim().toUpperCase() || 'PLAYER TWO';
+  const winner = Math.random() < 0.5 ? 1 : 2;
+  coin.textContent = winner === 1 ? 'X' : 'O';
+  coin.classList.add('flipping');
+  coinResult.textContent = `${playerNames[winner]} GOES FIRST!`;
+  setTimeout(() => { startScreen.classList.add('hidden'); newSetup(winner); }, 1100);
+});
 document.querySelector('#reset-round').addEventListener('click', () => { round++; newSetup(); });
 document.querySelector('#new-game').addEventListener('click', () => { scores = {1: 0, 2: 0}; round = 1; newSetup(); });
-newSetup();
