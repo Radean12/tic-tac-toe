@@ -1,3 +1,4 @@
+window.addEventListener('DOMContentLoaded', () => {
 const cells = [...document.querySelectorAll('.cell')];
 const statusText = document.querySelector('#status-text');
 const turnSymbol = document.querySelector('#turn-symbol');
@@ -70,3 +71,4 @@ startButton.addEventListener('click', () => {
 });
 document.querySelector('#reset-round').addEventListener('click', () => { round++; newSetup(); });
 document.querySelector('#new-game').addEventListener('click', () => { scores = {1: 0, 2: 0}; round = 1; newSetup(); });
+});
